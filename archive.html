@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Archive – Yankee Haiku</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Courier+Prime&family=Space+Mono:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream: #F5F1E8;
+      --ink: #1a1a1a;
+      --navy: #003087;
+      --red: #C41E3A;
+      --gray: #6b6b6b;
+      --light-gray: #d4d0c7;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Space Mono', monospace;
+      background-color: var(--cream);
+      color: var(--ink);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 2rem 2rem 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem;
+      letter-spacing: 0.05em;
+      color: var(--navy);
+      text-decoration: none;
+    }
+
+    .logo span {
+      color: var(--ink);
+    }
+
+    nav {
+      display: flex;
+      gap: 2rem;
+    }
+
+    nav a {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gray);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    nav a:hover {
+      color: var(--ink);
+    }
+
+    nav a.active {
+      color: var(--ink);
+    }
+
+    main {
+      flex: 1;
+      padding: 4rem 2rem;
+      max-width: 800px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.5rem;
+      letter-spacing: 0.05em;
+      margin-bottom: 3rem;
+      text-align: center;
+    }
+
+    .archive-list {
+      display: flex;
+      flex-direction: column;
+      gap: 3rem;
+    }
+
+    .archive-item {
+      padding-bottom: 3rem;
+      border-bottom: 1px solid var(--light-gray);
+    }
+
+    .archive-item:last-child {
+      border-bottom: none;
+    }
+
+    .archive-serial {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.2em;
+      color: var(--light-gray);
+      margin-bottom: 1rem;
+    }
+
+    .archive-haiku {
+      font-family: 'Courier Prime', monospace;
+      font-size: 1.2rem;
+      line-height: 2;
+      margin-bottom: 1.5rem;
+    }
+
+    .archive-haiku p {
+      margin: 0;
+    }
+
+    .archive-meta {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+      font-size: 0.75rem;
+      color: var(--gray);
+    }
+
+    .archive-meta span {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .result-w {
+      color: var(--ink);
+    }
+
+    .result-l {
+      color: var(--gray);
+    }
+
+    .loading {
+      text-align: center;
+      color: var(--gray);
+      font-style: italic;
+    }
+
+    .season-header {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem;
+      letter-spacing: 0.1em;
+      color: var(--navy);
+      margin-bottom: 2rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--navy);
+    }
+
+    footer {
+      padding: 2rem;
+      text-align: center;
+      font-size: 0.7rem;
+      color: var(--gray);
+      letter-spacing: 0.05em;
+    }
+
+    /* Mobile adjustments */
+    @media (max-width: 600px) {
+      header {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.5rem 1.5rem 0;
+      }
+
+      nav {
+        gap: 1.5rem;
+      }
+
+      main {
+        padding: 3rem 1.5rem;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      .archive-meta {
+        gap: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="/" class="logo">YANKEE<span>/HAIKU</span></a>
+    <nav>
+      <a href="/">Latest</a>
+      <a href="/archive" class="active">Archive</a>
+      <a href="/about">About</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1>ARCHIVE</h1>
+    
+    <div class="archive-list" id="archive-list">
+      <p class="loading">Loading...</p>
+    </div>
+  </main>
+
+  <footer>
+    © 2026 Five Brothers Fat Enterprise Inc.
+  </footer>
+
+  <script>
+    // ===========================================
+    // CONFIGURATION - Same URL as index.html
+    // ===========================================
+    const SHEET_CSV_URL = 'YOUR_GOOGLE_SHEET_CSV_URL_HERE';
+    // ===========================================
+
+    async function loadArchive() {
+      try {
+        const response = await fetch(SHEET_CSV_URL);
+        const csv = await response.text();
+        const rows = parseCSV(csv);
+        
+        if (rows.length < 1) {
+          showError('No haikus yet');
+          return;
+        }
+
+        // Reverse to show newest first
+        rows.reverse();
+        displayArchive(rows);
+      } catch (error) {
+        console.error('Error loading archive:', error);
+        showError('Could not load archive');
+      }
+    }
+
+    function parseCSV(csv) {
+      const lines = csv.trim().split('\n');
+      const headers = parseCSVLine(lines[0]);
+      
+      return lines.slice(1).map(line => {
+        const values = parseCSVLine(line);
+        const row = {};
+        headers.forEach((header, i) => {
+          row[header.trim()] = values[i] ? values[i].trim() : '';
+        });
+        return row;
+      });
+    }
+
+    function parseCSVLine(line) {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+      
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === '"') {
+          inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+          result.push(current);
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      result.push(current);
+      return result;
+    }
+
+    function displayArchive(rows) {
+      const container = document.getElementById('archive-list');
+      container.innerHTML = '';
+
+      let currentSeason = null;
+
+      rows.forEach(data => {
+        // Check for season change
+        const season = data.serial ? data.serial.split('.')[0] : '';
+        if (season && season !== currentSeason) {
+          currentSeason = season;
+          const seasonHeader = document.createElement('div');
+          seasonHeader.className = 'season-header';
+          seasonHeader.textContent = `${season} SEASON`;
+          container.appendChild(seasonHeader);
+        }
+
+        const item = document.createElement('div');
+        item.className = 'archive-item';
+
+        // Format date
+        const date = new Date(data.date);
+        const formattedDate = date.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric'
+        }).toUpperCase();
+
+        // Format opponent
+        const homeAway = data.home_away === 'home' ? 'vs' : '@';
+
+        // Format result
+        const hasScore = data.score_us && data.score_them;
+        const won = hasScore && parseInt(data.score_us) > parseInt(data.score_them);
+        const resultClass = hasScore ? (won ? 'result-w' : 'result-l') : '';
+        const resultText = hasScore ? (won ? 'W' : 'L') : '—';
+        const scoreText = hasScore ? `${data.score_us} – ${data.score_them}` : '—';
+
+        item.innerHTML = `
+          <div class="archive-serial">${data.serial || ''}</div>
+          <div class="archive-haiku">
+            <p>${data.line1 || ''}</p>
+            <p>${data.line2 || ''}</p>
+            <p>${data.line3 || ''}</p>
+          </div>
+          <div class="archive-meta">
+            <span>${formattedDate}</span>
+            <span>${homeAway} ${data.opponent}</span>
+            <span>${scoreText}</span>
+            <span class="${resultClass}">${resultText}</span>
+          </div>
+        `;
+
+        container.appendChild(item);
+      });
+    }
+
+    function showError(message) {
+      document.getElementById('archive-list').innerHTML = `<p class="loading">${message}</p>`;
+    }
+
+    // Load on page ready
+    loadArchive();
+  </script>
+</body>
+</html>
