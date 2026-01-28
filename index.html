@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yankee Haiku</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Courier+Prime&family=Space+Mono:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream: #F5F5F2;
+      --ink: #1a1a1a;
+      --navy: #003087;
+      --red: #C41E3A;
+      --gray: #6b6b6b;
+      --light-gray: #d4d0c7;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Space Mono', monospace;
+      background-color: var(--cream);
+      color: var(--ink);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 2rem 2rem 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem;
+      letter-spacing: 0.05em;
+      color: var(--navy);
+      text-decoration: none;
+    }
+
+    .logo span {
+      color: var(--ink);
+    }
+
+    nav {
+      display: flex;
+      gap: 2rem;
+    }
+
+    nav a {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gray);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    nav a:hover {
+      color: var(--ink);
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 4rem 2rem;
+      text-align: center;
+    }
+
+    .haiku-container {
+      position: relative;
+      max-width: 500px;
+    }
+
+    .haiku {
+      font-family: 'Courier Prime', monospace;
+      font-size: clamp(1.25rem, 3.5vw, 1.5rem);
+      font-weight: 400;
+      line-height: 2.2;
+      letter-spacing: 0.01em;
+      color: var(--ink);
+    }
+
+    .haiku p {
+      margin: 0;
+    }
+
+    /* Japanese stamp / hanko element */
+    .hanko {
+      position: absolute;
+      right: -60px;
+      bottom: -20px;
+      width: 50px;
+      height: 50px;
+      border: 2px solid var(--red);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.9;
+    }
+
+    .hanko span {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      color: var(--red);
+      letter-spacing: 0.05em;
+    }
+
+    .game-number {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.2em;
+      color: var(--light-gray);
+      margin-bottom: 2rem;
+    }
+
+    .game-info {
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--light-gray);
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .game-info-item {
+      text-align: center;
+    }
+
+    .game-info-label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--gray);
+      margin-bottom: 0.25rem;
+    }
+
+    .game-info-value {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.05em;
+    }
+
+    .game-info-value.result-w {
+      color: var(--ink);
+    }
+
+    .game-info-value.result-l {
+      color: var(--gray);
+    }
+
+    footer {
+      padding: 3rem 2rem 2rem;
+      text-align: center;
+    }
+
+    footer .mailing-list {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: none;
+      margin-bottom: 2rem;
+    }
+
+    .copyright {
+      font-size: 0.7rem;
+      color: var(--gray);
+      letter-spacing: 0.05em;
+    }
+
+    /* Mailing list signup */
+    .mailing-list {
+      text-align: center;
+    }
+
+    .mailing-list p {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gray);
+      margin-bottom: 1rem;
+    }
+
+    .mailing-list form {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .mailing-list input[type="email"] {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.8rem;
+      padding: 0.6rem 1rem;
+      border: 1px solid var(--light-gray);
+      background: transparent;
+      color: var(--ink);
+      width: 220px;
+      transition: border-color 0.2s ease;
+    }
+
+    .mailing-list input[type="email"]:focus {
+      outline: none;
+      border-color: var(--ink);
+    }
+
+    .mailing-list input[type="email"]::placeholder {
+      color: var(--gray);
+    }
+
+    .mailing-list button {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.9rem;
+      letter-spacing: 0.1em;
+      padding: 0.6rem 1.2rem;
+      border: 1px solid var(--ink);
+      background: var(--ink);
+      color: var(--cream);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .mailing-list button:hover {
+      background: transparent;
+      color: var(--ink);
+    }
+
+    /* Loading state */
+    .loading {
+      color: var(--gray);
+      font-style: italic;
+    }
+
+    /* Mobile adjustments */
+    @media (max-width: 600px) {
+      header {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.5rem 1.5rem 0;
+      }
+
+      nav {
+        gap: 1.5rem;
+      }
+
+      main {
+        padding: 3rem 1.5rem;
+      }
+
+      .hanko {
+        position: relative;
+        right: auto;
+        bottom: auto;
+        margin-top: 1.5rem;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .game-info {
+        gap: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="/" class="logo">YANKEE<span>/HAIKU</span></a>
+    <nav>
+      <a href="/">Latest</a>
+      <a href="/archive">Archive</a>
+      <a href="/about">About</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="haiku-container">
+      <div class="game-number" id="serial"></div>
+      
+      <div class="haiku" id="haiku">
+        <p class="loading">Loading...</p>
+      </div>
+      <div class="hanko">
+        <span>YH</span>
+      </div>
+    </div>
+
+    <div class="game-info" id="game-info">
+      <div class="game-info-item">
+        <div class="game-info-label">Date</div>
+        <div class="game-info-value" id="date">—</div>
+      </div>
+      <div class="game-info-item">
+        <div class="game-info-label">Opponent</div>
+        <div class="game-info-value" id="opponent">—</div>
+      </div>
+      <div class="game-info-item">
+        <div class="game-info-label">Final</div>
+        <div class="game-info-value" id="score">—</div>
+      </div>
+      <div class="game-info-item">
+        <div class="game-info-label">Result</div>
+        <div class="game-info-value" id="result">—</div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="mailing-list">
+      <p>Get each haiku by email</p>
+      <form action="YOUR_BUTTONDOWN_URL" method="post">
+        <input type="email" name="email" placeholder="your@email.com" required>
+        <button type="submit">Subscribe</button>
+      </form>
+    </div>
+    <div class="copyright">© 2026 Five Brothers Fat Enterprise Inc.</div>
+  </footer>
+
+  <script>
+    // ===========================================
+    // CONFIGURATION - Update this with your sheet URL
+    // ===========================================
+    const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTHyByJOMFJ2ijrRCq09isifkxQkdKZZWi7x7jBviLQsx7I5yDmWJAj0cXMyXuK6IGJYm7o8y1XXtta/pub?output=csv';
+    // To get this URL:
+    // 1. Open your Google Sheet
+    // 2. File → Share → Publish to web
+    // 3. Select "Sheet1" and "Comma-separated values (.csv)"
+    // 4. Click Publish and copy the URL
+    // ===========================================
+
+    async function loadLatestHaiku() {
+      try {
+        const response = await fetch(SHEET_CSV_URL);
+        const csv = await response.text();
+        const rows = parseCSV(csv);
+        
+        if (rows.length < 2) {
+          showError('No haikus yet');
+          return;
+        }
+
+        // Get the latest haiku (last row)
+        const latest = rows[rows.length - 1];
+        displayHaiku(latest);
+      } catch (error) {
+        console.error('Error loading haiku:', error);
+        showError('Could not load haiku');
+      }
+    }
+
+    function parseCSV(csv) {
+      const lines = csv.trim().split('\n');
+      const headers = parseCSVLine(lines[0]);
+      
+      return lines.slice(1).map(line => {
+        const values = parseCSVLine(line);
+        const row = {};
+        headers.forEach((header, i) => {
+          row[header.trim()] = values[i] ? values[i].trim() : '';
+        });
+        return row;
+      });
+    }
+
+    function parseCSVLine(line) {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+      
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === '"') {
+          inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+          result.push(current);
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      result.push(current);
+      return result;
+    }
+
+    function displayHaiku(data) {
+      // Display haiku lines
+      const haikuEl = document.getElementById('haiku');
+      haikuEl.innerHTML = `
+        <p>${data.line1 || ''}</p>
+        <p>${data.line2 || ''}</p>
+        <p>${data.line3 || ''}</p>
+      `;
+
+      // Display serial number
+      document.getElementById('serial').textContent = data.serial || '';
+
+      // Format and display date
+      const date = new Date(data.date);
+      const formattedDate = date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      }).toUpperCase();
+      document.getElementById('date').textContent = formattedDate;
+
+      // Display opponent
+      const homeAway = data.home_away === 'home' ? 'vs' : '@';
+      document.getElementById('opponent').textContent = `${homeAway} ${data.opponent}`;
+
+      // Display score
+      const scoreUs = data.score_us || '—';
+      const scoreThem = data.score_them || '—';
+      document.getElementById('score').textContent = `${scoreUs} – ${scoreThem}`;
+
+      // Display result
+      const resultEl = document.getElementById('result');
+      if (data.score_us && data.score_them) {
+        const won = parseInt(data.score_us) > parseInt(data.score_them);
+        resultEl.textContent = won ? 'W' : 'L';
+        resultEl.className = `game-info-value result-${won ? 'w' : 'l'}`;
+      } else {
+        resultEl.textContent = '—';
+      }
+    }
+
+    function showError(message) {
+      document.getElementById('haiku').innerHTML = `<p class="loading">${message}</p>`;
+    }
+
+    // Load on page ready
+    if (SHEET_CSV_URL === 'YOUR_GOOGLE_SHEET_CSV_URL_HERE') {
+      // Demo mode - show sample haiku
+      displayHaiku({
+        line1: 'kid from Boston throws',
+        line2: 'hundred miles of revenge—',
+        line3: "Bucky's ghost exhales",
+        date: '2025-10-02',
+        opponent: 'BOS',
+        home_away: 'home',
+        score_us: '4',
+        score_them: '0',
+        serial: '2025.WC3.NYY.BOS'
+      });
+    } else {
+      loadLatestHaiku();
+    }
+  </script>
+</body>
+</html>
